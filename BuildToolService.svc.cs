@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
 
 namespace BuildToolService
 {
@@ -9,7 +8,6 @@ namespace BuildToolService
     {
         public BuildToolService()
         {
-            Data.Init();
         }
 
         public string AuslieferungErstellen(string as_auslieferung, string as_versionVon, string as_versionBis, string as_fixVon, string as_fixBis, string as_kunde, string as_neueTodo, string as_ef3ordnerErstellen, string as_installationsroutineErstellen, string as_unterfixeBeruecksichtigen, string as_lokalErstellen, string as_woechentlichenBuild, string as_32bit, string as_internAuslieferung)
@@ -20,21 +18,20 @@ namespace BuildToolService
             }
             catch (ArgumentException arge)
             {
-            return arge.Message;
+                return arge.Message;
             }
         }
 
         public string GrossMigrationErstellen(string as_versionVon, string as_versionBis, string as_kunde)
         {
-             try
+            try
             {
-            return GrossMigration.OrdnerErstellen(as_versionVon, as_versionBis, as_kunde);
+                return GrossMigration.OrdnerErstellen(as_versionVon, as_versionBis, as_kunde);
             }
-              catch(ArgumentException arge)
+            catch (ArgumentException arge)
             {
-                  return arge.Message;
+                return arge.Message;
             }
-
         }
 
         public string MigrationsordnerZusammenErstellen(string as_versionVon, string as_versionBis, string as_datum_von, string as_datum_bis)
@@ -47,9 +44,8 @@ namespace BuildToolService
             {
                 return arge.Message;
             }
-
         }
-        public string DatenbankenMigrieren(string as_versionVon, string as_versionBis,string as_kunde)
+        public string DatenbankenMigrieren(string as_versionVon, string as_versionBis, string as_kunde)
         {
             try
             {
@@ -59,7 +55,6 @@ namespace BuildToolService
             {
                 return arge.Message;
             }
-
         }
         public string TestDatenbankMigrieren(string as_versionVon, string as_versionBis)
         {
@@ -71,7 +66,6 @@ namespace BuildToolService
             {
                 return arge.Message;
             }
-
         }
 
         public string VersionFuerEfErsetzen(string as_version, string as_kunde)
@@ -84,7 +78,6 @@ namespace BuildToolService
             {
                 return arge.Message;
             }
-
         }
 
         // Gibt Kunden Liste zurück
@@ -107,62 +100,47 @@ namespace BuildToolService
             return kundenTDB;
         }
 
-        // gibt eine Liste zurück für die Test-Datenbank 
+        // gibt eine Liste zurück für die Test-Datenbank
         public string[] GetKDatenbank()
         {
             string[] kundenTDB = Data.GetClientTestDatenbank();
             Array.Sort(kundenTDB);
-            string[] las_datenabnk;
             List<string> list = new List<string>();
             foreach (string kunde in kundenTDB)
             {
                 string datenbank = Data.GetKundenDatabase(kunde);
                 list.Add(datenbank);
- 
             }
-            las_datenabnk = list.ToArray();
-            
-            return las_datenabnk;
 
+            return list.ToArray();
         }
 
-        // gibt eine Liste zurück für den Server 
+        // gibt eine Liste zurück für den Server
         public string[] GetKServer()
         {
             string[] kundenTDB = Data.GetClientTestDatenbank();
             Array.Sort(kundenTDB);
-            string[] las_server;
             List<string> list = new List<string>();
             foreach (string kunde in kundenTDB)
             {
                 string server = Data.GetKundenServer(kunde);
                 list.Add(server);
-
             }
-            las_server = list.ToArray();
-            return las_server;
-
+            return list.ToArray();
         }
 
-        // gibt eine Liste zurück für den Kürzel  
+        // gibt eine Liste zurück für den Kürzel
         public string[] GetKKuerzel()
         {
             string[] kundenTDB = Data.GetClientTestDatenbank();
             Array.Sort(kundenTDB);
-            string[] las_kuerzel;
             List<string> list = new List<string>();
             foreach (string kunde in kundenTDB)
             {
                 string kuerzel = Data.GetKundenKuerzel(kunde);
                 list.Add(kuerzel);
-
             }
-            las_kuerzel = list.ToArray();
-            return las_kuerzel;
-
+            return list.ToArray();
         }
     }
-
-    
-
 }
