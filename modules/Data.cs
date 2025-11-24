@@ -1,10 +1,8 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Web;
 using System.IO;
-
+using Microsoft.Extensions.Configuration;
 
 namespace BuildToolService
 {
@@ -18,6 +16,7 @@ namespace BuildToolService
         private static string ss_webservice1, ss_webservice2, ss_webservice3, ss_webserviceInstallation, ss_webserviceAktualisierung, ss_kundenKennung, ss_kundenKennung1;
         private static string ss_kundenKennung2, ss_kundenFreigabe, ss_kundenFreigabe1, ss_kundenFreigabe2, ss_pdfDruck, ss_lokalMigDurchfuehren, ss_verteilerPfad;
         private static string ss_sharedpfad64, ss_sharedpfad32, ss_pathauslieferungsordnerIntern;
+        private static string ss_applicationRoot = AppContext.BaseDirectory;
         public static string GrossMigration1 { get { return ss_pathGrossmigration1; } }
         public static string GrossMigration2 { get { return ss_pathGrossmigration2; } }
         public static string GrossMigration3 { get { return ss_pathGrossmigration3; } }
@@ -43,143 +42,163 @@ namespace BuildToolService
         public static string sharedpfad32 { get { return ss_sharedpfad32; } }
         public static string AuslieferungsOrdnerIntern { get { return ss_pathauslieferungsordnerIntern; } }
         public static string GrossMigration5 { get { return ss_pathGrossmigration5; } }
-        public static void Init()
+        public static void Init(string applicationRoot, IConfiguration configuration)
         {
+            ss_applicationRoot = applicationRoot;
+            _ = configuration;
             StringBuilder sb = new StringBuilder(2048);
+            var configPath = BuildPath(ss_configIni);
 
-            if (GetPrivateProfileString("paths", "aktuellsteVersion", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "aktuellsteVersion", "", sb, 2048, configPath) > 0)
             {
                 ss_aktuellsteVersion = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "migrationDBIniPfad", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "migrationDBIniPfad", "", sb, 2048, configPath) > 0)
             {
-                ss_pathMIGRATIONDBIni = sb.ToString();
+                ss_pathMIGRATIONDBIni = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "vorlageEfIniPfad", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "vorlageEfIniPfad", "", sb, 2048, configPath) > 0)
             {
-                ss_pathEfvorlageIni = sb.ToString();
+                ss_pathEfvorlageIni = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "dateiregelIniPfad", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "dateiregelIniPfad", "", sb, 2048, configPath) > 0)
             {
-                ss_pathDateiregelIni = sb.ToString();
+                ss_pathDateiregelIni = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "grossMigration1", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "grossMigration1", "", sb, 2048, configPath) > 0)
             {
                 ss_pathGrossmigration1 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "grossMigration2", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "grossMigration2", "", sb, 2048, configPath) > 0)
             {
                 ss_pathGrossmigration2 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "grossMigration3", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "grossMigration3", "", sb, 2048, configPath) > 0)
             {
                 ss_pathGrossmigration3 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "grossMigration4", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "grossMigration4", "", sb, 2048, configPath) > 0)
             {
                 ss_pathGrossmigration4 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "auslieferung1", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "auslieferung1", "", sb, 2048, configPath) > 0)
             {
                 ss_pathauslieferung1 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "auslieferung2", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "auslieferung2", "", sb, 2048, configPath) > 0)
             {
                 ss_pathauslieferung2 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "auslieferung3", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "auslieferung3", "", sb, 2048, configPath) > 0)
             {
                 ss_pathauslieferung3 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "auslieferungsordner", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "auslieferungsordner", "", sb, 2048, configPath) > 0)
             {
-                ss_pathauslieferungsordner = sb.ToString();
+                ss_pathauslieferungsordner = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "auslieferungsordnerLOKAL", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "auslieferungsordnerLOKAL", "", sb, 2048, configPath) > 0)
             {
-                ss_pathauslieferungsordnerlokal = sb.ToString();
+                ss_pathauslieferungsordnerlokal = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "webservice1", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "webservice1", "", sb, 2048, configPath) > 0)
             {
                 ss_webservice1 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "webservice2", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "webservice2", "", sb, 2048, configPath) > 0)
             {
                 ss_webservice2 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "webservice3", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "webservice3", "", sb, 2048, configPath) > 0)
             {
                 ss_webservice3 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "webserviceAktualisierung", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "webserviceAktualisierung", "", sb, 2048, configPath) > 0)
             {
                 ss_webserviceAktualisierung = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "webserviceInstallation", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "webserviceInstallation", "", sb, 2048, configPath) > 0)
             {
                 ss_webserviceInstallation = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "instTemplatePfad", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "instTemplatePfad", "", sb, 2048, configPath) > 0)
             {
-                ss_instTemp = sb.ToString();
+                ss_instTemp = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "kundenKennung1", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "kundenKennung1", "", sb, 2048, configPath) > 0)
             {
                 ss_kundenKennung1 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "kundenKennung2", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "kundenKennung2", "", sb, 2048, configPath) > 0)
             {
                 ss_kundenKennung2 = sb.ToString();
             }
             ss_kundenKennung = ss_kundenKennung1 + ss_aktuellsteVersion + ss_kundenKennung2;
-            if (GetPrivateProfileString("paths", "kundenFreigabe1", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "kundenFreigabe1", "", sb, 2048, configPath) > 0)
             {
                 ss_kundenFreigabe1 = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "kundenFreigabe2", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "kundenFreigabe2", "", sb, 2048, configPath) > 0)
             {
                 ss_kundenFreigabe2 = sb.ToString();
             }
             ss_kundenFreigabe = ss_kundenFreigabe1 + ss_aktuellsteVersion + ss_kundenFreigabe2;
-            if (GetPrivateProfileString("paths", "pdfDruck", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "pdfDruck", "", sb, 2048, configPath) > 0)
             {
-                ss_pdfDruck = sb.ToString();
+                ss_pdfDruck = BuildPath(sb.ToString());
             }
-            if (GetPrivateProfileString("paths", "lokalMigDurchfuehren", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "lokalMigDurchfuehren", "", sb, 2048, configPath) > 0)
             {
                 ss_lokalMigDurchfuehren = sb.ToString();
             }
-            if (GetPrivateProfileString("paths", "verteilerPfad", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "verteilerPfad", "", sb, 2048, configPath) > 0)
             {
-                ss_verteilerPfad = sb.ToString();
+                ss_verteilerPfad = BuildPath(sb.ToString());
             }
 
-            if (GetPrivateProfileString("paths", "sharedpfad64", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "sharedpfad64", "", sb, 2048, configPath) > 0)
             {
                 ss_sharedpfad64 = sb.ToString();
             }
 
-            if (GetPrivateProfileString("paths", "sharedpfad32", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "sharedpfad32", "", sb, 2048, configPath) > 0)
             {
                 ss_sharedpfad32 = sb.ToString();
             }
 
-            if (GetPrivateProfileString("paths", "auslieferungsordnerIntern", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "auslieferungsordnerIntern", "", sb, 2048, configPath) > 0)
             {
-                ss_pathauslieferungsordnerIntern = sb.ToString();
+                ss_pathauslieferungsordnerIntern = BuildPath(sb.ToString());
             }
 
-            if (GetPrivateProfileString("paths", "grossMigration5", "", sb, 2048, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + ss_configIni) > 0)
+            if (GetPrivateProfileString("paths", "grossMigration5", "", sb, 2048, configPath) > 0)
             {
                 ss_pathGrossmigration5 = sb.ToString();
             }
         }
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+        private static int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Path.GetDirectoryName(filePath) ?? ss_applicationRoot)
+                .AddIniFile(filePath, optional: true, reloadOnChange: false)
+                .Build();
 
-        [DllImport("kernel32", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern UInt32 GetPrivateProfileSection([In][MarshalAs(UnmanagedType.LPStr)] string strSectionName, [In] IntPtr pReturnedString, [In] UInt32 nSize, [In][MarshalAs(UnmanagedType.LPStr)] string strFileName);
+            var value = configuration[$"{section}:{key}"] ?? def;
+            retVal.Clear();
+            retVal.Append(value);
+            return string.IsNullOrEmpty(value) ? 0 : value.Length;
+        }
+
+        private static string BuildPath(string relativeOrAbsolute)
+        {
+            if (Path.IsPathRooted(relativeOrAbsolute))
+            {
+                return relativeOrAbsolute;
+            }
+
+            return Path.Combine(ss_applicationRoot, relativeOrAbsolute);
+        }
 
         public static string[] GetClients()
         {
