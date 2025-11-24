@@ -1,0 +1,1 @@
+iscc "setup_normal.iss" /o"bin" /f"setup"
